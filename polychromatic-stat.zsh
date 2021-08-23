@@ -9,24 +9,25 @@ _silent_polychromatic() {
 }
 
 _polychromatic_preexec() {
-    if [ "$POLYCHROMATIC_STATUSCODE" != "" ]; then
-	_silent_polychromatic -o spectrum
+    if [ "$ENABLE_POLYCHROMATIC_STATUSCODE" != "true" ]; then
+        return 0
     fi
+    _silent_polychromatic -o spectrum
 }
 
 _polychromatic_precmd() {
     local exit_status="${1:-$(print -P %?)}";
-    if [ "$POLYCHROMATIC_STATUSCODE" != "" ]; then
-    	setopt local_options no_notify no_monitor
-        case "$exit_status" in
-            0)
-            _silent_polychromatic -o breath -p single -c "$POLYCHROMATIC_GREEN"
-            ;;
-            *)
-            _silent_polychromatic -o breath -p single -c "$POLYCHROMATIC_RED"
-            ;;
-        esac
+    if [ "$ENABLE_POLYCHROMATIC_STATUSCODE" != "true" ]; then
+        return 0
     fi
+    case "$exit_status" in
+        0)
+        _silent_polychromatic -o breath -p single -c "$POLYCHROMATIC_GREEN"
+        ;;
+        *)
+        _silent_polychromatic -o breath -p single -c "$POLYCHROMATIC_RED"
+        ;;
+    esac
 }
 
 precmd_functions+=(_polychromatic_precmd)
