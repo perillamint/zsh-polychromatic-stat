@@ -4,26 +4,30 @@ POLYCHROMATIC_GREEN='#00ff00'
 POLYCHROMATIC_BLUE='#0000ff'
 POLYCHROMATIC_WHITE='#ffffff'
 
+_silent_polychromatic() {
+    (polychromatic-cli "${@:1}" &)
+}
 
-polychromatic_preexec() {
+_polychromatic_preexec() {
     if [ "$POLYCHROMATIC_STATUSCODE" != "" ]; then
-        polychromatic-cli -o spectrum
+	_silent_polychromatic -o spectrum
     fi
 }
 
-polychromatic_precmd() {
+_polychromatic_precmd() {
     local exit_status="${1:-$(print -P %?)}";
     if [ "$POLYCHROMATIC_STATUSCODE" != "" ]; then
+    	setopt local_options no_notify no_monitor
         case "$exit_status" in
             0)
-            polychromatic-cli -o breath -p single -c "$POLYCHROMATIC_GREEN"
+            _silent_polychromatic -o breath -p single -c "$POLYCHROMATIC_GREEN"
             ;;
             *)
-            polychromatic-cli -o breath -p single -c "$POLYCHROMATIC_RED"
+            _silent_polychromatic -o breath -p single -c "$POLYCHROMATIC_RED"
             ;;
         esac
     fi
 }
 
-precmd_functions+=(polychromatic_precmd)
-preexec_functions+=(polychromatic_preexec)
+precmd_functions+=(_polychromatic_precmd)
+preexec_functions+=(_polychromatic_preexec)
